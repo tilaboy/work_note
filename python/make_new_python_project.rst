@@ -2,6 +2,9 @@
 make a new python project
 ========
 
+  Also check the info here:
+  https://cookiecutter-pypackage.readthedocs.io/en/latest/tutorial.html
+
  - repo name: easy-tokenizer, xml-miner
 
  - license
@@ -10,7 +13,10 @@ make a new python project
 
  - copy AUTHORS.rst, MANIFEST.rst, HISTORY.rst, Makefile, setup.py, setup.cfg, tox.ini, .travis.yml, requirements_dev.txt
 
- - add documentation from doc: Makefile, authors.rst, conf.py, history.rst, index.rst, installation.rst, readme.rst
+ - cp documentation to docs: Makefile, authors.rst, conf.py, history.rst, index.rst, installation.rst, readme.rst
+   run `make docs`, 
+   add all the rst into repo, conf.py and Makefile
+
 
  - adjust with the correct name and configuration 
 
@@ -18,7 +24,9 @@ make a new python project
 
  - flake8, or make test
 
- - CI/CD: 
+ - CI/CD:
+    
+    - locally, run `travis encrypt mypassword --add deploy.password`, mypassword is the pypi.org password, replace it with real password, no quote around, and check the change in .travis.yml 
 
     - check everything works at https://travis-ci.org
 
