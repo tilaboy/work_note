@@ -1,0 +1,18 @@
+
+tf:
+https://www.tensorflow.org/api_docs/python/tf/feature_column/shared_embedding_columns
+https://medium.com/tensorflow/how-to-serve-an-embedding-trained-with-estimators-681d5fa2fbe2
+https://towardsdatascience.com/how-to-use-dataset-in-tensorflow-c758ef9e4428
+https://www.youtube.com/watch?v=kVEOCfBy9uY
+https://github.com/tensorflow/tensor2tensor
+
+blogs:
+
+
+
+annotator:
+https://github.com/chakki-works/doccano
+
+
+layout infor and logical structure analysis:
+https://lhncbc.nlm.nih.gov/system/files/pub2007066.pdf
