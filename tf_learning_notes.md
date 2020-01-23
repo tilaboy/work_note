@@ -1,4 +1,16 @@
-* dataset
+## bert models:
+
+  bert as service: https://github.com/hanxiao/bert-as-service
+
+### smaller bert models:
+
+  albert: https://github.com/brightmart/albert_zh
+
+
+
+## tf estimate/dataset
+
+### dataset
 https://developers.googleblog.com/2017/09/introducing-tensorflow-datasets.html
 
 The return value must be a two-element tuple organized as follows: :
@@ -17,7 +29,7 @@ The tf.data API introduces two new abstractions
 
 https://developers.googleblog.com/2017/11/introducing-tensorflow-feature-columns.html
 
-* feature columns:
+### feature columns:
   - tf.numeric_column()
 
 ```
@@ -29,10 +41,10 @@ tf.feature_column.numeric_column(key="MyMatrix",shape=[10,5])
 
 The categorization splits a single input number into a four-element vector. Therefore, the model now can learn four individual weights rather than just one. Four weights creates a richer model than one. More importantly, bucketizing enables the model to clearly distinguish between different year categories since only one of the elements is set (1) and the other three elements are cleared 0. So, bucketing provides the model with additional important information that it can use to learn.
 
-# A numeric column for the raw input.
+#### A numeric column for the raw input.
 numeric_feature_column = tf.feature_column.numeric_column("Year")
 
-# Bucketize the numeric column on the years 1960, 1980, and 2000
+#### Bucketize the numeric column on the years 1960, 1980, and 2000
 bucketized_feature_column = tf.feature_column.bucketized_column(
     source_column = numeric_feature_column,
     boundaries = [1960, 1980, 2000])
@@ -83,8 +95,7 @@ embedding_column = tf.feature_column.embedding_column(
   dimension=dimension_of_embedding_vector)
 ```
 
-
-* Text classification example
+## Text classification example
 
 http://ruder.io/text-classification-tensorflow-estimators/
 
