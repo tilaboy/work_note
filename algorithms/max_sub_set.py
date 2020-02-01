@@ -64,15 +64,15 @@ def cross_search(arr, start, mid, end):
 @check_time
 def linear_search(arr):
     max_till_end = arr[0]
-    max_till_end_range = [0,1]
+    max_till_end_range = [0,0]
 
     max_inside = arr[0]
-    max_inside_range =[0,1]
+    max_inside_range =[0,0]
 
     for index in range(1, len(arr)):
         if arr[index] > max_till_end + arr[index]:
             max_till_end = arr[index]
-            max_till_end_range = [index, index + 1]
+            max_till_end_range = [index, index]
         else:
             max_till_end = max_till_end + arr[index]
             max_till_end_range[1] = index
@@ -101,13 +101,25 @@ def check_on_random_set():
 
 
 
+def poc_no_negative_max():
+    changes = [13, -3, -25, 20, -3, -16, -23, 18, 20, -7, 12, -5, -22, 15, -4, 7]
+    max_sum, sub_set = brutal_search(changes)
+    print(max_sum, sub_set)
+    max_sum, sub_set = divid_and_concor(changes)
+    print(max_sum, sub_set)
+    max_sum, sub_set = linear_search(changes)
+    print(max_sum, sub_set)
 
-changes = [13, -3, -25, 20, -3, -16, -23, 18, 20, -7, 12, -5, -22, 15, -4, 7]
-max_sum, sub_set = brutal_search(changes)
-print(max_sum, sub_set)
-max_sum, sub_set = divid_and_concor(changes)
-print(max_sum, sub_set)
-max_sum, sub_set = linear_search(changes)
-print(max_sum, sub_set)
+def poc_negative_max():
+    changes = [-13, -3, -25, -20, -3, -16, -23, -18, -20, -7, -12, -5, -22, -15, -4, -7]
+    max_sum, sub_set = brutal_search(changes)
+    print(max_sum, sub_set)
+    max_sum, sub_set = divid_and_concor(changes)
+    print(max_sum, sub_set)
+    max_sum, sub_set = linear_search(changes)
+    print(max_sum, sub_set)
 
+
+poc_no_negative_max()
+poc_negative_max()
 check_on_random_set()
