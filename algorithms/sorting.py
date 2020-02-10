@@ -131,21 +131,117 @@ def merge_sorted(arr, start, mid, end):
 
     arr[start+shift:end] = arr_1[:] if arr_1 else arr_2[:]
 
-def sort_array_test():
-    arr1 = [5, 2, 4, 6, 1, 3]
-    arr2 = [31, 41, 59, 26, 41, 58]
-    #print(insert_sort_increase(arr1))
-    #print(insert_sort_increase(arr2))
-    #print(insert_sort_decrease(arr1))
-    #print(insert_sort_decrease(arr2))
+def swap_elements(arr, i, j):
+    temp = arr[i]
+    arr[i] = arr[j]
+    arr[j] = temp
 
-    #merge_sort(arr1, 0, len(arr1))
-    #print(arr1)
-    #merge_sort(arr2, 0, len(arr2))
-    #print(arr2)
+def partition_arr(arr, start, end):
+    pivot = arr[end]
+    j = start - 1
+    for i in range(start, end + 1):
+        if arr[i] <= pivot:
+            j = j + 1
+            swap_elements(arr, i, j)
+            #print(arr)
+    return j
 
-    print(insert_sort_quick(arr1))
-    print(insert_sort_quick(arr2))
+def partition_hoare(arr, start, end):
+    x = arr[start]
+    i = start - 1
+    j = end + 1
+    #print(arr)
+    #print("pivot: {}".format(x))
+    while True:
+        #print("round")
+        while arr[j - 1] > x:
+            j = j - 1
+
+        while arr[i + 1] < x:
+            i = i + 1
+
+        if i + 1 < j - 1:
+            #print("swap {} [{}] <=> {} [{}]".format(i + 1, arr[i+1], j-1, arr[j-1]))
+            swap_elements(arr, i+1 ,j-1)
+            #print(arr)
+        else:
+            #print("reaching end", arr)
+            return j
+
+def partition_random(arr, start, end):
+    pivot_index = random.randint(start, end)
+    swap_elements(arr, pivot_index, end)
+    return partition_arr(arr, start, end)
+
+def partition_tail_recursive(arr, start, end):
+    while start < end:
+        tem_arr = arr[:]
+        print(start, end)
+        pivot = partition_arr(arr, start, end)
+        print("pivot", pivot, tem_arr, "=>", arr, "\t", arr[start:end+1])
+        partition_tail_recursive(arr, start, pivot - 1)
+        start = pivot + 1
+
+def partition_skip_equal_2(arr, start, end):
+    pivot = arr[end]
+    swap_elements(arr, start, end)
+    i = start - 1
+    k = start
+    print("start: ", arr)
+    for j in range(start+1, end):
+        print(arr)
+        if arr[j] > pivot:
+            i = i + 1
+            k = i + 2
+            swap_elements(arr, i, j)
+            print('\tlarge_i', arr)
+
+            swap_elements(arr, k, j)
+            print('\tlarger_k', arr)
+
+        if arr[j] == pivot:
+            k = k + 1
+            swap_elements(arr, j, k)
+
+            print('equal: ', arr)
+    print(i+1, k+1)
+    #swap_elements(arr, i+1, end)
+
+
+def partition_skip_equal(arr, start, end):
+    pivot = arr[end]
+    j = start - 1
+    k = end
+    for i in range(start, end + 1):
+        if arr[i] == pivot and i < k:
+            k = k - 1
+            swap_elements(arr, i, k)
+        if arr[i] <= pivot:
+            j = j + 1
+            swap_elements(arr, i, j)
+            #print(arr)
+        print(i, j, k, arr)
+    return j - ( end - k ), j
+
+
+def quick_sort(arr, start, end, func):
+    if start < end:
+        mid = func(arr, start, end)
+        quick_sort(arr, start, mid - 1, func)
+        quick_sort(arr, mid + 1, end, func)
+
+
+def test_quick_sort(partition_func):
+    arr = [42, 31, 41, 47, 59, 47, 26, 41, 58, 60, 47]
+    #print("partition at: ", partition_hoare(arr, 0, len(arr) - 1))
+    #(j, k) = partition_skip_equal(arr, 0, len(arr) - 1)
+    #print(arr, j, k)
+    #quick_sort(arr, 0, len(arr) -1, partition_func)
+    #print("sorted:", arr)
+    partition_skip_equal_2(arr, 0, len(arr) - 1)
+    print(arr)
+
+
 
 @check_time
 def sort_array_eval_merge(arr):
@@ -163,26 +259,49 @@ def sort_array_eval_quick_insert(arr):
 def sort_array_eval_min(arr):
     min_sort(arr)
 
+@check_time
+def sort_array_eval_quick(arr):
+    quick_sort(arr, 0, len(arr) -1, partition_arr)
+
+def sort_array_test():
+    arr1 = [5, 2, 4, 6, 1, 3]
+    arr2 = [31, 41, 59, 26, 41, 58]
+    #print(insert_sort_increase(arr1))
+    #print(insert_sort_increase(arr2))
+    #print(insert_sort_decrease(arr1))
+    #print(insert_sort_decrease(arr2))
+
+    #merge_sort(arr1, 0, len(arr1))
+    #print(arr1)
+    #merge_sort(arr2, 0, len(arr2))
+    #print(arr2)
+
+    print(insert_sort_quick(arr1))
+    print(insert_sort_quick(arr2))
+
 
 def test():
     sort_array_test()
 
-    arr3 = [random.randint(0, 100000) for i in range(10000)]
+    arr3 = [random.randint(0, 20000) for i in range(100000000)]
 
 
     arr_merge = arr3[:]
     arr_insert = arr3[:]
     arr_insert_quick = arr3[:]
     arr_min = arr3[:]
+    arr_quick = arr3[:]
 
-    sort_array_eval_insert(arr_insert)
+    #sort_array_eval_insert(arr_insert)
+    #sort_array_eval_min(arr_min)
     sort_array_eval_quick_insert(arr_insert_quick)
     sort_array_eval_merge(arr_merge)
-    sort_array_eval_min(arr_min)
-
-    #for i in range(50):
-    #    print(arr_merge[i], arr_min[i], arr_insert[i])
+    sort_array_eval_quick(arr_quick)
 
     assert arr_merge == arr_insert
     assert arr_min == arr_insert
     assert arr_min == arr_insert_quick
+    assert arr_min == arr_quick
+
+
+test_quick_sort(partition_arr)
