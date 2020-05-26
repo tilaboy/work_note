@@ -98,7 +98,8 @@ for batch_index in range(num_batches):
     sparse_categorical_accuracy.update_state(y_true=data_loader.test_label[start_index: end_index], y_pred=y_pred)
 print("test accuracy: %f" % sparse_categorical_accuracy.result())
 ```
-## CNN
+
+### CNN
 
 使用 Keras 中预定义的经典卷积神经网络结构:
 
@@ -224,4 +225,106 @@ class SparseCategoricalAccuracy(tf.keras.metrics.Metric):
         return self.count / self.total
 ```
 
-#
+## save and restore
+
+- Checkpoint 只保存模型的参数，不保存模型的计算过程
+
+- tf.train.Checkpoint() 接受的初始化参数是一个 `**kwargs` 具体而言，是一系列的键值对，键名可以随意取，值为需要保存的对象。例如，如果我们希望保存一个继承 tf.keras.Model 的模型实例 model 和一个继承 tf.train.Optimizer 的优化器 optimizer
+
+```
+checkpoint = tf.train.Checkpoint(myAwesomeModel=model, myAwesomeOptimizer=optimizer)
+checkpoint.save(save_path_with_prefix)
+```
+
+- 在 save 目录下: checkpoint 、 model.ckpt-1.index 、 model.ckpt-1.data-00000-of-00001 的三个文件，这些文件就记录了变量信息。
+
+- checkpoint.save() 方法可以运行多次，每运行一次都会得到一个.index 文件和.data 文件，序号依次累加
+
+```
+model_to_be_restored = MyModel()
+# 键名保持为“myAwesomeModel”
+checkpoint = tf.train.Checkpoint(myAwesomeModel=model_to_be_restored)
+checkpoint.restore(save_path_with_prefix_and_index)
+```
+
+- CheckpointManager can be used to 保留最后的几个 Checkpoint, 并使用 batch 的编号作为 Checkpoint 的文件编号
+
+```
+checkpoint = tf.train.Checkpoint(myAwesomeModel=model)
+manager = tf.train.CheckpointManager(checkpoint, directory='./save', max_to_keep=3)
+....
+if batch_index % 100 == 0:
+    path = manager.save(checkpoint_number=batch_index)
+    print("model saved to %s" % path)
+```
+
+## TensorBoard
+
+- 每运行一次 tf.summary.scalar() ，记录器就会向记录文件中写入一条记录
+
+```
+summary_writer = tf.summary.create_file_writer('./tensorboard')
+with summary_writer.as_default():
+    tf.summary.scalar("loss", loss, step=batch_index)
+    tf.summary.scalar("MyScalar", my_scalar, step=batch_index)
+```
+
+- trace model training processs:
+
+TensorBoard 中选择 “Profile”，以时间轴的方式查看各操作的耗时情况
+
+```
+tf.summary.trace_on(profiler=True)
+with summary_writer.as_default():
+    tf.summary.trace_export(name="model_trace", step=0, profiler_outdir=log_dir)
+```
+
+
+## tf.data
+
+- tf.data 的核心是 tf.data.Dataset 类，提供了对数据集的高层封装。
+
+- tf.data.Dataset 由一系列的可迭代访问的元素（element）组成，每个元素包含一个或多个张量。比如说，对于一个由图像组成的数据集，每个元素可以是一个形状为 长×宽×通道数 的图片张量，也可以是由图片张量和图片标签张量组成的元组（Tuple）
+
+```
+X = tf.constant([2013, 2014, 2015, 2016, 2017])
+Y = tf.constant([12000, 14000, 15000, 16500, 17500])
+
+# 也可以使用NumPy数组，效果相同
+# X = np.array([2013, 2014, 2015, 2016, 2017])
+# Y = np.array([12000, 14000, 15000, 16500, 17500])
+
+# 当提供多个张量作为输入时，张量的第 0 维大小必须相同
+dataset = tf.data.Dataset.from_tensor_slices((X, Y))
+```
+
+- 对于特别巨大而无法完整载入内存的数据集，我们可以先将数据集处理为 TFRecord 格式，然后使用 tf.data.TFRocrdDataset() 进行载入
+
+- tf.data.Dataset 类为我们提供了多种数据集预处理方法:
+  - Dataset.map(f) ：对数据集中的每个元素应用函数 f ，得到一个新的数据集
+  - Dataset.shuffle(buffer_size) ：将数据集打乱(设定一个固定大小的缓冲区（Buffer），取出前 buffer_size 个元素放入，并从缓冲区中随机采样，采样后的数据用后续数据替换)
+  - Dataset.batch(batch_size) ：将数据集分成批次，即对每 batch_size 个元素，使用 tf.stack() 在第 0 维合并，成为一个元素
+  - Dataset.repeat(): 重复数据集的元素
+  - Dataset.reduce(): 与 Map 相对的聚合操作
+  - Dataset.take(): 截取数据集中的前若干个元素
+
+
+- buffer_size in shuffle:
+  - 设定一个固定大小为 buffer_size 的缓冲区（Buffer）；
+  - 初始化时，取出数据集中的前 buffer_size 个元素放入缓冲区；
+  - 每次需要从数据集中取元素时，即从缓冲区中随机采样一个元素并取出，然后从后续的元素中取出一个放回到之前被取出的位置，以维持缓冲区的大小。
+  - 当 buffer_size 设置为 1 时，其实等价于没有进行任何打散
+  - 当数据集的标签顺序分布极为不均匀（例如二元分类时数据集前 N 个的标签为 0，后 N 个的标签为 1）时, 需要设置较大的缓冲区
+
+
+- tf.data 并行化策略
+
+  - Dataset.prefetch(): 预取出若干个元素, 使得在 GPU 训练的同时 CPU 可以准备数据
+```
+mnist_dataset = mnist_dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+```
+
+  - Dataset.map():
+```
+mnist_dataset = mnist_dataset.map(map_func=rot90, num_parallel_calls=nr_cpus)
+```
