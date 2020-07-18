@@ -73,24 +73,16 @@ def edit_dis(x, y):
             j += 1
 
 
-Ops = {0: 'copy', 1: 'twiddle', 2: 'replace', 3: 'delete', 4: 'insert'}
-
+Ops = {0: 'copy', 2: 'replace', 3: 'delete', 4: 'insert'}
 def edit_dis_recu(x, y, i, j, best_cost, best_choice):
-    #print("checking", i, j, x, y)
-
     if i == len(x):
-        #print("delect all rest of y: {}".format(y[j:]))
         return 1 * (len(y) - j)
     if j == len(y):
-        #print("delect all rest of x: {}".format(x[i:]))
         return 1 * (len(x) - i)
 
-    costs = [float('inf')] * 5
+    costs = [float('inf')] * 4
     if x[i] == y[j]:
         costs[0] = 0 + edit_dis_recu(x, y, i+1, j+1, best_cost, best_choice)
-    elif i + 1 < len(x) and j+1 < len(y) and \
-        x[i] == y[j+1] and y[j] == x[i+1]:
-            costs[1]= 1 + edit_dis_recu(x, y, i+2, j+2, best_cost, best_choice)
     else:
         costs[2] = 1 + edit_dis_recu(x, y, i+1, j+1, best_cost, best_choice)
         costs[3] = 1 + edit_dis_recu(x, y, i+1, j, best_cost, best_choice)
@@ -98,7 +90,6 @@ def edit_dis_recu(x, y, i, j, best_cost, best_choice):
     index, cost = min(enumerate(costs), key=lambda x:x[1])
     best_cost[i][j] = cost
     best_choice[i][j] = ("{} x{}({}) y{}({})".format(Ops[index], i, x[i], j, y[j]))
-    #print(i, x[i], j, y[j], costs)
     return min(costs)
 
 
