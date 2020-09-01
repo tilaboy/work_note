@@ -171,6 +171,16 @@ class BTree:
         inorder(self.root)
         print()
 
+    def _print_postorder(self):
+        def postorder(node):
+            if node is not None:
+                postorder(node.l)
+                postorder(node.r)
+                print(node.value, end=' ')
+        postorder(self.root)
+        print()
+
+
     def _print_inorder_iter(self):
         current = self.root
         stack = list()
@@ -232,13 +242,15 @@ class BTree:
 
 
 
-arr = [15, 6, 18, 3, 9, 17, 20, 2, 4, 7, 13, 19, 8, 10, 14, 11, 12]
+#arr = [15, 6, 18, 3, 9, 17, 20, 2, 4, 7, 13, 19, 8, 10, 14, 11, 12]
+arr = [20, 10, 30, 5, 15, 25, 40, 13, 17]
 test_tree = BTree()
 test_tree._build(arr)
 test_tree._print_inorder()
-test_tree._print_inorder_iter()
+test_tree._print_postorder()
+#test_tree._print_inorder_iter()
 #test_tree._print_preorder()
-test_tree._print_preorder_iter()
+#test_tree._print_preorder_iter()
 
 preorder_list = list()
 test_tree._print_preorder(preorder_list)
