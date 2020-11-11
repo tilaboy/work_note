@@ -31,6 +31,17 @@ g_22_8 = {
     'z': []
 }
 
+g_22_9 = {
+    'a': ['b'],
+    'b': ['c', 'e', 'f'],
+    'c': ['d', 'g'],
+    'd': ['c', 'h'],
+    'e': ['a', 'f'],
+    'f': ['g'],
+    'g': ['f', 'h'],
+    'h': ['h']
+}
+
 graph_22_6 = Graph(g_22_6)
 graph_22_8 = Graph(g_22_8)
 
@@ -59,3 +70,5 @@ print('from r to x:', path_rx)
 graph_22_6.dfs()
 
 strongly_connected_components(g_22_8)
+strongly_connected_components(g_22_6)
+strongly_connected_components(g_22_9)

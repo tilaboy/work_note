@@ -106,16 +106,36 @@ class Graph:
 
     def scc_detect(self):
         self.reset_graph()
+        scc = dict()
         visited = {node: 0 for node in self.nodes}
-        prev_visisted = dict(visited)
-        
+        prev_visited = dict(visited)
         for cur_node in self.nodes:
-
-            if not visited[cur_node]:
+            if visited[cur_node] == 0:
                 LOGGER.debug('start a new tree: {}'.format(cur_node.val))
                 self._dfs(cur_node, visited)
+                tree_nodes = ''.join([node.val
+                              for node in visited
+                              if visited[node] > 0 and prev_visited[node] == 0])
+                for node in visited:
+                    if visited[node] > 1:
+                        visited[node] = 1
+                        if node.val in tree_nodes:
+                            print('\t{} inside {}'.format(node.val, tree_nodes))
+                        else:
+                            for known_scc in scc:
+                                if node.val in known_scc:
+                                    print('\t{} from [{}], link to {}'.format(node.val, known_scc, tree_nodes))
+                                    if tree_nodes not in scc[known_scc]:
+                                        scc[known_scc].append(tree_nodes)
+                                    break
+                            else:
+                                print('no scc found for {}, scc: {}'.format(node.val, scc))
+
+                scc[tree_nodes] = list()
+                prev_visited = dict(visited)
             else:
                 LOGGER.debug('node {} already visisted'.format(cur_node.val))
+        return scc
 
 
     def dfs(self):
@@ -141,11 +161,12 @@ class Graph:
                 self._dfs(edge.node, visited)
             else:
                 # if child is ancestor of the node when node -> child and child is visited
+                visited[edge.node] += 1
                 circle = self._ancestors(node, edge.node)
                 if circle:
                     print('circle: {}'.format(circle))
                     self.has_circle = True
-                LOGGER.debug('{} already visited (now try from {})'.format(edge.node.val, node.val))
+                LOGGER.debug('{} visited (now from {})'.format(edge.node.val, node.val))
             edge = edge.next_edge
         self.time += 1
         node.f = self.time
@@ -270,5 +291,6 @@ def strongly_connected_components(graph):
     graph_obj.dfs()
     trans_graph = graph_obj._transpose()
     trans_graph_obj = Graph(trans_graph)
-    print("strongly connected components")
-    trans_graph_obj.dfs()
+    print("checking strongly connected components")
+    scc = trans_graph_obj.scc_detect()
+    print(scc)
