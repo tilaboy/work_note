@@ -30,10 +30,12 @@ class GraphNode:
 
         return "val: {}, edges: {}".format(self.val, all_edge_vals)
 
+
 class GraphEdgeNode:
     def __init__(self, node: GraphNode):
         self.node = node
         self.next_edge = None
+
 
 class Graph:
     '''
@@ -278,19 +280,3 @@ class Graph:
                 trans_graph[node.val] = []
 
         return trans_graph
-
-def strongly_connected_components(graph):
-    '''
-    params:
-        - graph: dict of { node: list of connected nodes }
-
-    output:
-        - sorted_nodes: sorted node
-    '''
-    graph_obj = Graph(graph)
-    graph_obj.dfs()
-    trans_graph = graph_obj._transpose()
-    trans_graph_obj = Graph(trans_graph)
-    print("checking strongly connected components")
-    scc = trans_graph_obj.scc_detect()
-    print(scc)
