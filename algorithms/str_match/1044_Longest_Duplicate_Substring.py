@@ -6,7 +6,7 @@ def print_hash(num_hash, s):
     print(new_hash)
 
 class Solution:
-    def longestDupSubstring(self, s: str) -> str:
+    def rolling_hash_long_dup_str(self, s: str) -> str:
         def find_same(seq, length, window_size, base, p, s):
             left, right, rh, f_power, rh = 0, 0, 0, pow(base, window_size, p), 0
             while right < window_size:
@@ -32,8 +32,7 @@ class Solution:
             mid = left + (right - left) // 2
             sub_str = find_same(ord_c, len_s, mid, 26, large_num, s)
             if sub_str is not None:
-                longest_repeated = sub_str
-                left = mid + 1
+                longest_repeated, left = sub_str, mid + 1
             else:
                 right = mid - 1
         return longest_repeated
@@ -72,6 +71,6 @@ cases = [
 ]
 
 for case in cases:
-    result = sol.longestDupSubstring(case["input"])
+    result = sol.rolling_hash_long_dup_str(case["input"])
     #print(case["input"], "=>", result)
     assert result == case['expect']
