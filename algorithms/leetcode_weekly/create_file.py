@@ -3,10 +3,11 @@ import sys
 import re
 
 def main():
-    filename = sys.argv[1]
+    dir = sys.argv[1]
+    filename = sys.argv[2]
     filename = re.sub(r'[ .]+', '_', filename)
     filename += '.py'
-    print(f"create file: {filename}")
+    print(f"create file: {dir}/{filename}")
     content = '''from typing import List
 
 class Solution:
@@ -31,7 +32,7 @@ for case in cases:
     assert result == case['expect']
 
 '''
-    with open(filename, 'w', encoding='utf-8') as file_h:
+    with open(os.path.join(dir, filename), 'w', encoding='utf-8') as file_h:
         file_h.write(content)
 
 
