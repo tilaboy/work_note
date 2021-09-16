@@ -9,7 +9,6 @@ class Solution:
             while mono_queue and num < mono_queue[-1][1]:
                 index, value = mono_queue.pop()
             mono_queue.append((i_num, num))
-        print(mono_queue)
         subarr_start = 0
         while subarr_start < len(mono_queue) and mono_queue[subarr_start][0] == subarr_start:
             subarr_start += 1
@@ -22,11 +21,9 @@ class Solution:
             while mono_queue and num > mono_queue[-1][1]:
                 index, value = mono_queue.pop()
             mono_queue.append((i_num, num))
-        print(mono_queue)
         subarr_end = nr_nums - 1
         while subarr_end > 0 and mono_queue[nr_nums - 1 - subarr_end][0] == subarr_end:
             subarr_end -= 1
-        print(subarr_start, subarr_end)
         return subarr_end - subarr_start + 1
 
 
