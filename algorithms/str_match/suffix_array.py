@@ -67,8 +67,10 @@ How to use:
 -
 '''
 
+import sys
 import time
 import random
+#from functools import lru_cache
 
 long_str = 'agbccnegdeaf' * 4000
 random_str = ''.join([chr(random.randint(97,122)) for i in range(30000)])
@@ -99,6 +101,24 @@ def power_search(value):
     return mid if score > value else mid + 1
 
 
+
+def quick_sort(arr, start=0, end=None):
+    #print(arr[start:end+1])
+    if end is None:
+        end = len(arr) - 1
+    if start < end:
+        i_pivot = partition_arr(arr, start, end)
+        quick_sort(arr, start, i_pivot - 1)
+        quick_sort(arr, i_pivot + 1, end)
+
+def partition_arr(arr, start, end):
+    last_small, i_pivot, pivot = start - 1, end, arr[end][0]
+    for i_cur in range(start, end + 1):
+        if arr[i_cur][0] <= pivot:
+            last_small += 1
+            arr[last_small], arr[i_cur] = arr[i_cur], arr[last_small]
+    return last_small
+
 def suffix_array_sort(string):
     string = string + '$'
     all_suffices = [string[i:] + string[:i] for i in range(len(string))]
@@ -111,11 +131,14 @@ def suffix_array_standard(string):
     p, c = [0] * len_s,  [0] * len_s
     dist, k = 0, 0
     while dist < len_s:
-        arr = string if k == 0 else [
+        arr = [ele for ele in string] if k == 0 else [
             (c[i], c[(i+dist) % len_s])
             for i in range(len_s)
         ]
-        p = sorted(range(len_s), key=arr.__getitem__)
+        #p = sorted(range(len_s), key=arr.__getitem__)
+        arr_to_sort = [(ele, i_ele) for i_ele, ele in enumerate(arr)]
+        quick_sort(arr_to_sort, 0, len_s - 1)
+        p = [ele[1] for ele in arr_to_sort]
         c[p[0]] = 0
         for i in range(1, len_s):
             if arr[p[i]] != arr[p[i-1]]:
@@ -241,8 +264,13 @@ def suffix_array_radix_improve(string):
                 score = c[new_i]
                 p_new[pos[score]] = new_i
                 pos[score] += 1
+            # c     = 0, 1, 1, 2, 3, 3, 4, 4, 4, 4, 5
+            # count = 1, 2, 1, 2, 4, 1, 0, 0, 0, 0, 0
+            # pos   = 0, 1, 3, 4, 6, 10, 11, 11, 11, 11, 11
+            # print(f'{p}, {c}, {count}, {pos}')
+
             p = p_new
-            
+
             new_c = [0] * len_s
             for i in range(1, len_s):
                 cur = (c[p[i]], c[(p[i] + dist) % len_s])
@@ -258,6 +286,8 @@ def suffix_array_radix_improve(string):
         dist = 1 << (k - 1)
     return p
 
+# to avoid recuraion limitation error
+sys.setrecursionlimit(15000)
 
 p_start = time.time()
 p_python = [suffix_array_sort(string) for string in sa_cases]
